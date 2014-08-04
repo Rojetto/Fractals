@@ -104,7 +104,7 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		}
 		
 		if (e.getButton() == MouseEvent.BUTTON2) {
-			Tween.set(plotter, PlotterAccessor.CENTER)
+			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
 			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * 2f, (float) plotter.getHeight() * 2f)
 			.start(manager);
 		}

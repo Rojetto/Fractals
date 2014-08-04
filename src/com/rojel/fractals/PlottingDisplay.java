@@ -15,6 +15,7 @@ import aurelienribon.tweenengine.TweenManager;
 
 public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener {
 	private static final long serialVersionUID = -8158869774426846742L;
+	public static final float ZOOM_FACTOR = 3.0f;
 	
 	private Plotter plotter;
 	private BufferedImage lastPlot;
@@ -95,17 +96,21 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		double plotX = plotter.screenToPlotX(mouseX);
 		double plotY = plotter.screenToPlotY(mouseY);
 		
-		System.out.println(plotX + " " + plotY);
-		
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
-			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * 0.5f, (float) plotter.getHeight() * 0.5f)
+			.target((float) plotX, (float) plotY, (float) plotter.getWidth() / ZOOM_FACTOR, (float) plotter.getHeight() / ZOOM_FACTOR)
+			.start(manager);
+		}
+		
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
+			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * ZOOM_FACTOR, (float) plotter.getHeight() * ZOOM_FACTOR)
 			.start(manager);
 		}
 		
 		if (e.getButton() == MouseEvent.BUTTON2) {
-			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
-			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * 2f, (float) plotter.getHeight() * 2f)
+			Tween.set(plotter, PlotterAccessor.CENTER)
+			.target((float) plotX, (float) plotY)
 			.start(manager);
 		}
 	}

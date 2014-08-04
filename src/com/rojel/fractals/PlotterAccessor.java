@@ -5,6 +5,7 @@ import aurelienribon.tweenengine.TweenAccessor;
 public class PlotterAccessor implements TweenAccessor<Plotter> {
 	public static final int MIN_MAX = 1;
 	public static final int CENTER_WIDTH_HEIGHT = 2;
+	public static final int CENTER = 3;
 
 	@Override
 	public int getValues(Plotter target, int tweenType, float[] returnValues) {
@@ -21,6 +22,10 @@ public class PlotterAccessor implements TweenAccessor<Plotter> {
 			returnValues[2] = (float) target.getWidth();
 			returnValues[3] = (float) target.getHeight();
 			return 4;
+		case CENTER:
+			returnValues[0] = (float) target.getCenterX();
+			returnValues[1] = (float) target.getCenterY();
+			return 2;
 		default:
 			assert false;
 			return -1;
@@ -41,6 +46,10 @@ public class PlotterAccessor implements TweenAccessor<Plotter> {
 			target.setCenterY(newValues[1]);
 			target.setWidth(newValues[2]);
 			target.setHeight(newValues[3]);
+			break;
+		case CENTER:
+			target.setCenterX(newValues[0]);
+			target.setCenterY(newValues[1]);
 			break;
 		default:
 			assert false;

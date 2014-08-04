@@ -1,27 +1,39 @@
 package com.rojel.fractals;
 
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.BorderLayout;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 
 import com.rojel.fractals.plottables.Julia;
 
-public class PlottingFrame extends JFrame implements ComponentListener {
+public class PlottingFrame extends JFrame implements PlottingListener {
 	private static final long serialVersionUID = -7367816153167274339L;
 
 	private PlottingDisplay display;
+	private JProgressBar progress;
 	
 	public PlottingFrame() {
 		super("Plotter");
-		this.setLayout(null);
-		this.setSize(500, 500);
-		this.addComponentListener(this);
+		
+		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
-		display = new PlottingDisplay(new Julia());
-		display.setLocation(0, 0);
-		this.add(display);
+		display = new PlottingDisplay(new Plotter(new Julia()));
+		this.add(display, BorderLayout.CENTER);
+		
+		progress = new JProgressBar(0, 100);
+		this.add(progress, BorderLayout.SOUTH);
+		
+		display.getPlotter().addPlottingListener(this);
+		
+		this.pack();
+		
+		this.setSize(500, 500);
+		
+		display.getPlotter().setCenterX(0);
+		display.getPlotter().setCenterY(0);
 		
 		this.setVisible(true);
 	}
@@ -31,19 +43,11 @@ public class PlottingFrame extends JFrame implements ComponentListener {
 	}
 
 	@Override
-	public void componentResized(ComponentEvent e) {
-		display.setSize(this.getWidth() - 16, this.getHeight() - 38);
+	public void plottingFinished(BufferedImage image) {
 	}
 
 	@Override
-	public void componentMoved(ComponentEvent e) {
-	}
-
-	@Override
-	public void componentShown(ComponentEvent e) {
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) {
+	public void plottingProgress(int progress) {
+		this.progress.setValue(progress);
 	}
 }

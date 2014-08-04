@@ -1,10 +1,12 @@
 package com.rojel.fractals;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Plotter {
 	private Plottable plottable;
+	private List<PlottingListener> listeners;
 	private double minX;
 	private double minY;
 	private double maxX;
@@ -14,6 +16,7 @@ public class Plotter {
 	
 	public Plotter(Plottable plottable) {
 		this.plottable = plottable;
+		this.listeners = new ArrayList<PlottingListener>();
 		
 		this.minX = -1;
 		this.minY = -1;
@@ -21,6 +24,10 @@ public class Plotter {
 		this.maxY = 1;
 		this.width = 100;
 		this.height = 100;
+	}
+	
+	public void addPlottingListener(PlottingListener listener) {
+		listeners.add(listener);
 	}
 
 	public double getMinX() {
@@ -76,7 +83,9 @@ public class Plotter {
 	}
 	
 	public void setWidth(double width) {
-		this.maxX = this.minX + width;
+		double centerX = getCenterX();
+		this.minX = centerX - width / 2.0;
+		this.maxX = centerX + width / 2.0;
 	}
 	
 	public double getHeight() {
@@ -84,7 +93,9 @@ public class Plotter {
 	}
 	
 	public void setHeight(double height) {
-		this.maxY = this.minY + height;
+		double centerY = getCenterY();
+		this.minY = centerY - height / 2.0;
+		this.maxY = centerY + height / 2.0;
 	}
 	
 	public double getCenterX() {
@@ -92,8 +103,10 @@ public class Plotter {
 	}
 	
 	public void setCenterX(double x) {
-		this.minX = x - getWidth() / 2f;
-		this.maxX = x + getWidth() / 2f;
+		double width = getWidth();
+		
+		this.minX = x - width / 2f;
+		this.maxX = x + width / 2f;
 	}
 	
 	public double getCenterY() {
@@ -101,28 +114,42 @@ public class Plotter {
 	}
 	
 	public void setCenterY(double y) {
-		this.minY = y - getHeight() / 2f;
-		this.maxY = y + getHeight() / 2f;
+		double height = getHeight();
+		
+		this.minY = y - height / 2f;
+		this.maxY = y + height / 2f;
 	}
 
-	public BufferedImage plot() {
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		double xRes = getWidth() / getRenderWidth();
-		double yRes = getHeight() / getRenderHeight();
-		
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				float pixel = plottable.getPixel(screenToPlotX(x), screenToPlotY(y), xRes, yRes);
+	public void plot() {
+		new Thread(new Runnable() {
+			public void run() {
+				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				double xRes = getWidth() / getRenderWidth();
+				double yRes = getHeight() / getRenderHeight();
 				
-				try {
-					image.setRGB(x, y, new Color(1 - pixel, 1 - pixel, 1 - pixel).getRGB());
-				} catch (Exception e) {
-					
+				int lastProgress = 0;
+				
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						float pixel = plottable.getPixel(screenToPlotX(x), screenToPlotY(y), xRes, yRes);
+						try {
+							image.setRGB(x, y, (int) (256 * 256 * 256 * pixel));
+						} catch (Exception e) {
+						}
+						
+						int progress = (int) ((float) (y * width + x) / (float) (width * height) * 100f) + 1;
+						if (lastProgress != progress) {
+							lastProgress = progress;
+							for (PlottingListener listener : listeners)
+								listener.plottingProgress(progress);
+						}
+					}
 				}
+				
+				for (PlottingListener listener : listeners)
+					listener.plottingFinished(image);
 			}
-		}
-		
-		return image;
+		}).start();
 	}
 	
 	public double screenToPlotX(double screenX) {

@@ -12,19 +12,20 @@ import javax.swing.JComponent;
 
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Cubic;
 
-public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener {
+public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener {
 	private static final long serialVersionUID = -8158869774426846742L;
 	
 	private Plotter plotter;
 	private BufferedImage lastPlot;
-	private final TweenManager manager;
+	private TweenManager manager;
 	
-	public PlottingDisplay(Plottable plottable) {
+	public PlottingDisplay(Plotter plotter) {
+		this.plotter = plotter;
+		this.plotter.addPlottingListener(this);
+		
 		this.addMouseListener(this);
 		this.addComponentListener(this);
-		plotter = new Plotter(plottable);
 		
 		Tween.setCombinedAttributesLimit(4);
 		Tween.registerAccessor(Plotter.class, new PlotterAccessor());
@@ -34,8 +35,9 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 			public void run() {
 				while (true) {
 					manager.update(1f / 40f);
-					if (manager.getRunningTweensCount() > 0)
-						repaint();
+					if (manager.getRunningTweensCount() > 0) {
+						plotter.plot();
+					}
 					try {
 						Thread.sleep(25);
 					} catch (InterruptedException e) {
@@ -49,7 +51,6 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 	
 	@Override
 	protected void paintComponent(Graphics g) {
-		lastPlot = plotter.plot();
 		g.drawImage(lastPlot, 0, 0, plotter.getRenderWidth(), plotter.getRenderHeight(), null);
 		
 		g.setColor(Color.RED);
@@ -78,6 +79,14 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 				g.drawString("" + i, yWidth - 12, plotter.plotToScreenY(i) - 2);
 	}
 
+	public Plotter getPlotter() {
+		return plotter;
+	}
+
+	public void setPlotter(Plotter plotter) {
+		this.plotter = plotter;
+	}
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		int mouseX = e.getX();
@@ -89,16 +98,14 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		System.out.println(plotX + " " + plotY);
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			Tween.to(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT, 0.2f)
+			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
 			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * 0.5f, (float) plotter.getHeight() * 0.5f)
-			.ease(Cubic.OUT)
 			.start(manager);
 		}
 		
 		if (e.getButton() == MouseEvent.BUTTON2) {
-			Tween.to(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT, 0.2f)
-			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * 2, (float) plotter.getHeight() * 2)
-			.ease(Cubic.OUT)
+			Tween.set(plotter, PlotterAccessor.CENTER)
+			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * 2f, (float) plotter.getHeight() * 2f)
 			.start(manager);
 		}
 	}
@@ -125,6 +132,8 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		plotter.setRenderWidth(this.getWidth());
 		plotter.setHeight(plotter.getHeight() * this.getHeight() / plotter.getRenderHeight());
 		plotter.setRenderHeight(this.getHeight());
+		
+		plotter.plot();
 	}
 
 	@Override
@@ -137,5 +146,15 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
+	}
+
+	@Override
+	public void plottingFinished(BufferedImage image) {
+		lastPlot = image;
+		repaint();
+	}
+
+	@Override
+	public void plottingProgress(int progress) {
 	}
 }

@@ -1,12 +1,12 @@
 package com.rojel.fractals;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Plotter {
 	private Plottable plottable;
 	private List<PlottingListener> listeners;
+	private PlottingThread plottingThread;
 	private double minX;
 	private double minY;
 	private double maxX;
@@ -121,35 +121,19 @@ public class Plotter {
 	}
 
 	public void plot() {
-		new Thread(new Runnable() {
-			public void run() {
-				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-				double xRes = getWidth() / getRenderWidth();
-				double yRes = getHeight() / getRenderHeight();
+		if (plottingThread != null)
+			plottingThread.setCancelled(true);
+		
+		plottingThread = new PlottingThread(this);
+		plottingThread.start();
+	}
 
-				int lastProgress = 0;
+	public Plottable getPlottable() {
+		return plottable;
+	}
 
-				for (int y = 0; y < height; y++) {
-					for (int x = 0; x < width; x++) {
-						float pixel = plottable.getPixel(screenToPlotX(x), screenToPlotY(y), xRes, yRes);
-						try {
-							image.setRGB(x, y, (int) (256 * 256 * 256 * pixel));
-						} catch (Exception e) {
-						}
-
-						int progress = (int) ((float) (y * width + x) / (float) (width * height) * 100f) + 1;
-						if (lastProgress != progress) {
-							lastProgress = progress;
-							for (PlottingListener listener : listeners)
-								listener.plottingProgress(progress);
-						}
-					}
-				}
-
-				for (PlottingListener listener : listeners)
-					listener.plottingFinished(image);
-			}
-		}).start();
+	public List<PlottingListener> getListeners() {
+		return new ArrayList<PlottingListener>(listeners);
 	}
 
 	public double screenToPlotX(double screenX) {

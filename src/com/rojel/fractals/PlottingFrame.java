@@ -4,13 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
-import com.rojel.fractals.plottables.Mandelbrot;
+import com.rojel.fractals.plottables.Julia;
 
 public class PlottingFrame extends JFrame implements PlottingListener {
 	private static final long serialVersionUID = -7367816153167274339L;
 
+	private JLabel label;
 	private PlottingDisplay display;
 	private JProgressBar progress;
 
@@ -19,8 +21,14 @@ public class PlottingFrame extends JFrame implements PlottingListener {
 
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-		display = new PlottingDisplay(new Plotter(new Mandelbrot()));
+		
+		double real = (Math.random() - 0.5) * 1.5;
+		double imaginary = (Math.random() - 0.5) * 1.5;
+		
+		label = new JLabel(real + " + " + imaginary + "i");
+		this.add(label, BorderLayout.NORTH);
+		
+		display = new PlottingDisplay(new Plotter(new Julia(real, imaginary)));
 		this.add(display, BorderLayout.CENTER);
 
 		progress = new JProgressBar(0, 100);

@@ -7,7 +7,7 @@ import com.rojel.fractals.Plottable;
 public class Mandelbrot implements Plottable {
 	@Override
 	public float getPixel(double x, double y, double xRes, double yRes) {
-		int maxIterations = 200;
+		int maxIterations = 500;
 		double bailout = 2;
 		Complex c = new Complex(x, y);
 

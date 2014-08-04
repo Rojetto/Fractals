@@ -10,16 +10,14 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
-import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenAccessor;
-import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Cubic;
 
 public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener, TweenAccessor<PlottingDisplay> {
 	private static final long serialVersionUID = -8158869774426846742L;
-	public static final float ZOOM_FACTOR = 3.0f;
+	public static final float ZOOM_FACTOR = 3f;
 	public static final int IMAGE_X_Y_WIDTH_HEIGHT = 1;
 
 	private Plotter plotter;
@@ -63,7 +61,7 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 	@Override
 	protected void paintComponent(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.drawRect(0, 0, this.getWidth(), this.getHeight());
+		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		g.drawImage(lastPlot, (int) imageX, (int) imageY, (int) imageWidth, (int) imageHeight, null);
 
 		// g.setColor(Color.RED);
@@ -113,27 +111,24 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		double plotX = plotter.screenToPlotX(mouseX);
 		double plotY = plotter.screenToPlotY(mouseY);
 		
-		if (e.getButton() == MouseEvent.BUTTON1) {
+		if (e.getButton() == MouseEvent.BUTTON1) {			
 			float newWidth = imageWidth * ZOOM_FACTOR;
 			float newHeight = imageHeight * ZOOM_FACTOR;
-			float newX = imageX + (imageWidth - newWidth) / 2f - (mouseX - this.getWidth() / 2f) * ZOOM_FACTOR;
-			float newY = imageY + (imageHeight - newHeight) / 2f - (mouseY - this.getHeight() / 2f) * ZOOM_FACTOR;
+			float deltaX = (mouseX - this.getWidth() / 2f) * (float) newWidth / (float) this.getWidth();
+			float newX = imageX + (imageWidth - newWidth) / 2f - deltaX;
+			float deltaY = (mouseY - this.getHeight() / 2f) * (float) newHeight / (float) this.getHeight();
+			float newY = imageY + (imageHeight - newHeight) / 2f - deltaY;
+			
+			plotter.setCenterX(plotX);
+			plotter.setCenterY(plotY);
+			plotter.setWidth(plotter.getWidth() / ZOOM_FACTOR);
+			plotter.setHeight(plotter.getHeight() / ZOOM_FACTOR);
+
+			plotter.plot();
 			
 			Tween.to(this, IMAGE_X_Y_WIDTH_HEIGHT, 0.8f)
 			.target(newX, newY, newWidth, newHeight)
 			.ease(Cubic.OUT)
-			.setCallbackTriggers(TweenCallback.COMPLETE)
-			.setCallback(new TweenCallback() {
-				@Override
-				public void onEvent(int type, BaseTween<?> source) {
-					plotter.setCenterX(plotX);
-					plotter.setCenterY(plotY);
-					plotter.setWidth(plotter.getWidth() / ZOOM_FACTOR);
-					plotter.setHeight(plotter.getHeight() / ZOOM_FACTOR);
-
-					plotter.plot();
-				}
-			})
 			.start(manager);
 		}
 
@@ -143,21 +138,16 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 			float newX = imageX + (imageWidth - newWidth) / 2f - (mouseX - this.getWidth() / 2f) / ZOOM_FACTOR;
 			float newY = imageY + (imageHeight - newHeight) / 2f - (mouseY - this.getHeight() / 2f) / ZOOM_FACTOR;
 			
+			plotter.setCenterX(plotX);
+			plotter.setCenterY(plotY);
+			plotter.setWidth(plotter.getWidth() * ZOOM_FACTOR);
+			plotter.setHeight(plotter.getHeight() * ZOOM_FACTOR);
+
+			plotter.plot();
+			
 			Tween.to(this, IMAGE_X_Y_WIDTH_HEIGHT, 0.8f)
 			.target(newX, newY, newWidth, newHeight)
 			.ease(Cubic.OUT)
-			.setCallbackTriggers(TweenCallback.COMPLETE)
-			.setCallback(new TweenCallback() {
-				@Override
-				public void onEvent(int type, BaseTween<?> source) {
-					plotter.setCenterX(plotX);
-					plotter.setCenterY(plotY);
-					plotter.setWidth(plotter.getWidth() * ZOOM_FACTOR);
-					plotter.setHeight(plotter.getHeight() * ZOOM_FACTOR);
-
-					plotter.plot();
-				}
-			})
 			.start(manager);
 		}
 
@@ -209,12 +199,29 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 
 	@Override
 	public void plottingFinished(BufferedImage image) {
-		lastPlot = image;
-		imageX = 0;
-		imageY = 0;
-		imageWidth = image.getWidth();
-		imageHeight = image.getHeight();
-		repaint();
+		new Thread(new Runnable() {
+			public void run() {
+				while (true) {
+					int tweenCount = manager.getRunningTweensCount();
+					if (tweenCount == 0)
+						break;
+					
+					try {
+						Thread.sleep(20);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				lastPlot = image;
+				imageX = 0;
+				imageY = 0;
+				imageWidth = image.getWidth();
+				imageHeight = image.getHeight();
+				repaint();
+			}
+		}).start();
 	}
 
 	@Override

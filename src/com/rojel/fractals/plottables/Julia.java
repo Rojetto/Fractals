@@ -10,7 +10,7 @@ public class Julia implements Plottable {
 		int maxIterations = 50;
 		double bailout = 2;
 		Complex c = new Complex(-0.67, 0.53);
-		
+
 		Complex z = new Complex(x, y);
 		int i = 0;
 		while (i < maxIterations) {
@@ -19,7 +19,7 @@ public class Julia implements Plottable {
 				break;
 			i++;
 		}
-		
+
 		return (float) i / (float) maxIterations;
 	}
 }

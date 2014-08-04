@@ -10,7 +10,7 @@ public class Mandelbrot implements Plottable {
 		int maxIterations = 200;
 		double bailout = 2;
 		Complex c = new Complex(x, y);
-		
+
 		Complex z = new Complex(0, 0);
 		int i = 0;
 		while (i < maxIterations) {
@@ -19,7 +19,7 @@ public class Mandelbrot implements Plottable {
 				break;
 			i++;
 		}
-		
+
 		return (float) i / (float) maxIterations;
 	}
 }

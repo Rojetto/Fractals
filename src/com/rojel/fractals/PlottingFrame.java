@@ -13,33 +13,33 @@ public class PlottingFrame extends JFrame implements PlottingListener {
 
 	private PlottingDisplay display;
 	private JProgressBar progress;
-	
+
 	public PlottingFrame() {
 		super("Plotter");
-		
+
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
+
 		display = new PlottingDisplay(new Plotter(new Mandelbrot()));
 		this.add(display, BorderLayout.CENTER);
-		
+
 		progress = new JProgressBar(0, 100);
 		this.add(progress, BorderLayout.SOUTH);
-		
+
 		display.getPlotter().addPlottingListener(this);
-		
+
 		this.pack();
-		
+
 		this.setSize(500, 500);
-		
+
 		display.getPlotter().setCenterX(0);
 		display.getPlotter().setCenterY(0);
 		display.getPlotter().setWidth(1);
 		display.getPlotter().setHeight(1);
-		
+
 		this.setVisible(true);
 	}
-	
+
 	public static void main(String[] args) {
 		new PlottingFrame();
 	}

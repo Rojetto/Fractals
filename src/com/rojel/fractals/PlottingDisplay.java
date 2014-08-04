@@ -10,74 +10,88 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
+import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenAccessor;
+import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Cubic;
 
-public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener {
+public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener, TweenAccessor<PlottingDisplay> {
 	private static final long serialVersionUID = -8158869774426846742L;
 	public static final float ZOOM_FACTOR = 3.0f;
-	
+	public static final int IMAGE_X_Y_WIDTH_HEIGHT = 1;
+
 	private Plotter plotter;
 	private BufferedImage lastPlot;
 	private TweenManager manager;
-	
+
+	private float imageX;
+	private float imageY;
+	private float imageWidth;
+	private float imageHeight;
+
 	public PlottingDisplay(Plotter plotter) {
 		this.plotter = plotter;
 		this.plotter.addPlottingListener(this);
-		
+
 		this.addMouseListener(this);
 		this.addComponentListener(this);
-		
+
 		Tween.setCombinedAttributesLimit(4);
 		Tween.registerAccessor(Plotter.class, new PlotterAccessor());
+		Tween.registerAccessor(PlottingDisplay.class, this);
 		manager = new TweenManager();
-		
+
 		new Thread(new Runnable() {
 			public void run() {
 				while (true) {
 					manager.update(1f / 40f);
-					if (manager.getRunningTweensCount() > 0) {
-						plotter.plot();
-					}
+					if (manager.getRunningTweensCount() > 0)
+						repaint();
 					try {
 						Thread.sleep(25);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
-				
+
 			}
 		}).start();
 	}
-	
+
 	@Override
 	protected void paintComponent(Graphics g) {
-		g.drawImage(lastPlot, 0, 0, plotter.getRenderWidth(), plotter.getRenderHeight(), null);
-		
-		g.setColor(Color.RED);
-		
-		int xHeight = plotter.plotToScreenY(0);
-		if (xHeight < 0)
-			xHeight = 0;
-		if (xHeight >= plotter.getRenderHeight())
-			xHeight = plotter.getRenderHeight() - 1;
-		
-		g.drawLine(0, xHeight, getWidth(), xHeight);
-		
-		for (int i = (int) plotter.screenToPlotX(0); i <= (int) plotter.screenToPlotX(getWidth()) + 1; i++)
-			g.drawString("" + i, plotter.plotToScreenX(i) + 2, xHeight + 12);
-		
-		int yWidth = plotter.plotToScreenX(0);
-		if (yWidth < 0)
-			yWidth = 0;
-		if (yWidth >= plotter.getRenderWidth())
-			yWidth = plotter.getRenderWidth() - 1;
-		
-		g.drawLine(yWidth, 0, yWidth, getHeight());
-		
-		for (int i = (int) plotter.screenToPlotY(getHeight()) - 1; i <= (int) plotter.screenToPlotY(0); i++)
-			if (i != 0)
-				g.drawString("" + i, yWidth - 12, plotter.plotToScreenY(i) - 2);
+		g.setColor(Color.BLACK);
+		g.drawRect(0, 0, this.getWidth(), this.getHeight());
+		g.drawImage(lastPlot, (int) imageX, (int) imageY, (int) imageWidth, (int) imageHeight, null);
+
+		// g.setColor(Color.RED);
+		//
+		// int xHeight = plotter.plotToScreenY(0);
+		// if (xHeight < 0)
+		// xHeight = 0;
+		// if (xHeight >= plotter.getRenderHeight())
+		// xHeight = plotter.getRenderHeight() - 1;
+		//
+		// g.drawLine(0, xHeight, getWidth(), xHeight);
+		//
+		// for (int i = (int) plotter.screenToPlotX(0); i <= (int)
+		// plotter.screenToPlotX(getWidth()) + 1; i++)
+		// g.drawString("" + i, plotter.plotToScreenX(i) + 2, xHeight + 12);
+		//
+		// int yWidth = plotter.plotToScreenX(0);
+		// if (yWidth < 0)
+		// yWidth = 0;
+		// if (yWidth >= plotter.getRenderWidth())
+		// yWidth = plotter.getRenderWidth() - 1;
+		//
+		// g.drawLine(yWidth, 0, yWidth, getHeight());
+		//
+		// for (int i = (int) plotter.screenToPlotY(getHeight()) - 1; i <= (int)
+		// plotter.screenToPlotY(0); i++)
+		// if (i != 0)
+		// g.drawString("" + i, yWidth - 12, plotter.plotToScreenY(i) - 2);
 	}
 
 	public Plotter getPlotter() {
@@ -90,28 +104,68 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		if (manager.getRunningTweensCount() > 0)
+			return;
+		
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		
+
 		double plotX = plotter.screenToPlotX(mouseX);
 		double plotY = plotter.screenToPlotY(mouseY);
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
-			.target((float) plotX, (float) plotY, (float) plotter.getWidth() / ZOOM_FACTOR, (float) plotter.getHeight() / ZOOM_FACTOR)
+			float newWidth = imageWidth * ZOOM_FACTOR;
+			float newHeight = imageHeight * ZOOM_FACTOR;
+			float newX = imageX + (imageWidth - newWidth) / 2f - (mouseX - this.getWidth() / 2f) * ZOOM_FACTOR;
+			float newY = imageY + (imageHeight - newHeight) / 2f - (mouseY - this.getHeight() / 2f) * ZOOM_FACTOR;
+			
+			Tween.to(this, IMAGE_X_Y_WIDTH_HEIGHT, 0.8f)
+			.target(newX, newY, newWidth, newHeight)
+			.ease(Cubic.OUT)
+			.setCallbackTriggers(TweenCallback.COMPLETE)
+			.setCallback(new TweenCallback() {
+				@Override
+				public void onEvent(int type, BaseTween<?> source) {
+					plotter.setCenterX(plotX);
+					plotter.setCenterY(plotY);
+					plotter.setWidth(plotter.getWidth() / ZOOM_FACTOR);
+					plotter.setHeight(plotter.getHeight() / ZOOM_FACTOR);
+
+					plotter.plot();
+				}
+			})
 			.start(manager);
 		}
-		
+
 		if (e.getButton() == MouseEvent.BUTTON3) {
-			Tween.set(plotter, PlotterAccessor.CENTER_WIDTH_HEIGHT)
-			.target((float) plotX, (float) plotY, (float) plotter.getWidth() * ZOOM_FACTOR, (float) plotter.getHeight() * ZOOM_FACTOR)
+			float newWidth = imageWidth / ZOOM_FACTOR;
+			float newHeight = imageHeight / ZOOM_FACTOR;
+			float newX = imageX + (imageWidth - newWidth) / 2f - (mouseX - this.getWidth() / 2f) / ZOOM_FACTOR;
+			float newY = imageY + (imageHeight - newHeight) / 2f - (mouseY - this.getHeight() / 2f) / ZOOM_FACTOR;
+			
+			Tween.to(this, IMAGE_X_Y_WIDTH_HEIGHT, 0.8f)
+			.target(newX, newY, newWidth, newHeight)
+			.ease(Cubic.OUT)
+			.setCallbackTriggers(TweenCallback.COMPLETE)
+			.setCallback(new TweenCallback() {
+				@Override
+				public void onEvent(int type, BaseTween<?> source) {
+					plotter.setCenterX(plotX);
+					plotter.setCenterY(plotY);
+					plotter.setWidth(plotter.getWidth() * ZOOM_FACTOR);
+					plotter.setHeight(plotter.getHeight() * ZOOM_FACTOR);
+
+					plotter.plot();
+				}
+			})
 			.start(manager);
 		}
-		
+
 		if (e.getButton() == MouseEvent.BUTTON2) {
-			Tween.set(plotter, PlotterAccessor.CENTER)
-			.target((float) plotX, (float) plotY)
-			.start(manager);
+			plotter.setCenterX(plotX);
+			plotter.setCenterY(plotY);
+
+			plotter.plot();
 		}
 	}
 
@@ -137,7 +191,7 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		plotter.setRenderWidth(this.getWidth());
 		plotter.setHeight(plotter.getHeight() * this.getHeight() / plotter.getRenderHeight());
 		plotter.setRenderHeight(this.getHeight());
-		
+
 		plotter.plot();
 	}
 
@@ -156,10 +210,44 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 	@Override
 	public void plottingFinished(BufferedImage image) {
 		lastPlot = image;
+		imageX = 0;
+		imageY = 0;
+		imageWidth = image.getWidth();
+		imageHeight = image.getHeight();
 		repaint();
 	}
 
 	@Override
 	public void plottingProgress(int progress) {
+	}
+
+	@Override
+	public int getValues(PlottingDisplay target, int tweenType, float[] returnValues) {
+		switch (tweenType) {
+		case IMAGE_X_Y_WIDTH_HEIGHT:
+			returnValues[0] = imageX;
+			returnValues[1] = imageY;
+			returnValues[2] = imageWidth;
+			returnValues[3] = imageHeight;
+			return 4;
+		default:
+			assert false;
+			return -1;
+		}
+	}
+
+	@Override
+	public void setValues(PlottingDisplay target, int tweenType, float[] newValues) {
+		switch (tweenType) {
+		case IMAGE_X_Y_WIDTH_HEIGHT:
+			imageX = newValues[0];
+			imageY = newValues[1];
+			imageWidth = newValues[2];
+			imageHeight = newValues[3];
+			break;
+		default:
+			assert false;
+			break;
+		}
 	}
 }

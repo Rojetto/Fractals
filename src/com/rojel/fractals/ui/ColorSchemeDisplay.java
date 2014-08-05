@@ -17,9 +17,11 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 	private static final long serialVersionUID = -3782880793289155494L;
 	
 	private ColorScheme scheme;
+	private List<ColorSchemeListener> listeners;
 	
 	public ColorSchemeDisplay(ColorScheme scheme) {
 		this.scheme = scheme;
+		this.listeners = new ArrayList<ColorSchemeListener>();
 		this.setPreferredSize(new Dimension(0, 30));
 		
 		this.addMouseListener(this);
@@ -43,6 +45,19 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 		
 		g.setColor(Color.GRAY);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+	}
+	
+	public void addColorSchemeListener(ColorSchemeListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void setColorScheme(ColorScheme scheme) {
+		this.scheme = scheme;
+		repaint();
+	}
+
+	public ColorScheme getScheme() {
+		return scheme;
 	}
 
 	@Override
@@ -70,6 +85,9 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 					scheme.putColor(1.0, Color.WHITE);
 			}
 		}
+		
+		for (ColorSchemeListener listener : listeners)
+			listener.colorSchemeChanged(scheme);
 		
 		repaint();
 	}

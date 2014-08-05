@@ -136,7 +136,11 @@ public class Plotter {
 		return plottable;
 	}
 
-	public ColorScheme getScheme() {
+	public void setColorScheme(ColorScheme scheme) {
+		this.scheme = scheme;
+	}
+
+	public ColorScheme getColorScheme() {
 		return scheme;
 	}
 

@@ -15,7 +15,7 @@ public class Julia implements Plottable {
 	
 	@Override
 	public int getPixel(double x, double y, double xRes, double yRes, ColorScheme scheme) {
-		int maxIterations = (int) (100 + 0.006d / xRes);;
+		int maxIterations = (int) (100 + 0.004d / xRes);;
 		double bailout = 50;
 
 		Complex z = new Complex(x, y);

@@ -17,7 +17,7 @@ import aurelienribon.tweenengine.equations.Cubic;
 
 public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener, TweenAccessor<PlottingDisplay> {
 	private static final long serialVersionUID = -8158869774426846742L;
-	public static final float ZOOM_FACTOR = 3f;
+	public static final float ZOOM_FACTOR = 5f;
 	public static final int IMAGE_X_Y_WIDTH_HEIGHT = 1;
 
 	private Plotter plotter;

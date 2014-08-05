@@ -6,8 +6,10 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import com.rojel.fractals.plottables.Julia;
+import com.rojel.fractals.plottables.Mandelbrot;
 
 public class PlottingFrame extends JFrame implements PlottingListener {
 	private static final long serialVersionUID = -7367816153167274339L;
@@ -18,17 +20,32 @@ public class PlottingFrame extends JFrame implements PlottingListener {
 
 	public PlottingFrame() {
 		super("Plotter");
-
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
-		double real = (Math.random() - 0.5) * 1.5;
-		double imaginary = (Math.random() - 0.5) * 1.5;
+//		double real = (Math.random() - 0.5) * 1.5;
+//		double imaginary = (Math.random() - 0.5) * 1.5;
+//		
+//		label = new JLabel(real + " + " + imaginary + "i");
+//		this.add(label, BorderLayout.NORTH);
 		
-		label = new JLabel(real + " + " + imaginary + "i");
-		this.add(label, BorderLayout.NORTH);
-		
-		display = new PlottingDisplay(new Plotter(new Julia(real, imaginary)));
+		display = new PlottingDisplay(new Plotter(new Mandelbrot()));
 		this.add(display, BorderLayout.CENTER);
 
 		progress = new JProgressBar(0, 100);

@@ -1,14 +1,17 @@
 package com.rojel.fractals.plottables;
 
+import java.awt.Color;
+
 import org.apache.commons.math3.complex.Complex;
 
+import com.rojel.fractals.ColorScheme;
 import com.rojel.fractals.Plottable;
 
 public class Mandelbrot implements Plottable {
 	@Override
-	public float getPixel(double x, double y, double xRes, double yRes) {
-		int maxIterations = 500;
-		double bailout = 2;
+	public int getPixel(double x, double y, double xRes, double yRes) {
+		int maxIterations = (int) (100 + 0.006d / xRes);
+		double bailout = 50;
 		Complex c = new Complex(x, y);
 
 		Complex z = new Complex(0, 0);
@@ -20,6 +23,14 @@ public class Mandelbrot implements Plottable {
 			i++;
 		}
 
-		return (float) i / (float) maxIterations;
+		int color = Color.BLACK.getRGB();
+		
+		ColorScheme scheme = new ColorScheme();
+		scheme.putColor(0.3, Color.RED);
+		
+		if (i < maxIterations - 1)
+			color = scheme.getRGB((double) i / (double) maxIterations);
+		
+		return color;
 	}
 }

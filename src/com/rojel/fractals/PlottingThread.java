@@ -24,9 +24,9 @@ public class PlottingThread extends Thread {
 				if (cancelled)
 					return;
 				
-				float pixel = plotter.getPlottable().getPixel(plotter.screenToPlotX(x), plotter.screenToPlotY(y), xRes, yRes);
+				int rgb = plotter.getPlottable().getPixel(plotter.screenToPlotX(x), plotter.screenToPlotY(y), xRes, yRes);
 				try {
-					image.setRGB(x, y, (int) (256 * 256 * 256 * pixel));
+					image.setRGB(x, y, rgb);
 				} catch (Exception e) {
 				}
 

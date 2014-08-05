@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
-import com.rojel.fractals.plottables.Mandelbrot;
+import com.rojel.fractals.plottables.Julia;
 import com.rojel.fractals.render.ColorScheme;
 import com.rojel.fractals.render.Plotter;
 import com.rojel.fractals.render.PlottingListener;
@@ -35,7 +35,7 @@ public class PlottingFrame extends JFrame implements PlottingListener {
 		scheme.putColor(0.0, new Color(100, 0, 0));
 		scheme.putColor(0.3, Color.RED);
 		
-		display = new PlottingDisplay(new Plotter(new Mandelbrot(), scheme));
+		display = new PlottingDisplay(new Plotter(new Julia(0.2, 0.6), scheme));
 		this.add(display, BorderLayout.CENTER);
 
 		progress = new JProgressBar(0, 100);

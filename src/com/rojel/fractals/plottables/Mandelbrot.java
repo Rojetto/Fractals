@@ -4,8 +4,7 @@ import java.awt.Color;
 
 import org.apache.commons.math3.complex.Complex;
 
-import com.rojel.fractals.ColorScheme;
-import com.rojel.fractals.Plottable;
+import com.rojel.fractals.render.ColorScheme;
 
 public class Mandelbrot implements Plottable {
 	@Override
@@ -26,6 +25,7 @@ public class Mandelbrot implements Plottable {
 		int color = Color.BLACK.getRGB();
 		
 		ColorScheme scheme = new ColorScheme();
+		scheme.putColor(0.0, new Color(100, 0, 0));
 		scheme.putColor(0.3, Color.RED);
 		
 		if (i < maxIterations - 1)

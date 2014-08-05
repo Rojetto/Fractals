@@ -1,6 +1,5 @@
 package com.rojel.fractals.plottables;
 
-import com.rojel.fractals.Plottable;
 
 public class Parabola implements Plottable {
 	@Override

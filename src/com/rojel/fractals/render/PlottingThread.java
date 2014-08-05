@@ -1,4 +1,4 @@
-package com.rojel.fractals;
+package com.rojel.fractals.render;
 
 import java.awt.image.BufferedImage;
 

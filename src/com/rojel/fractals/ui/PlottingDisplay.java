@@ -1,4 +1,4 @@
-package com.rojel.fractals;
+package com.rojel.fractals.ui;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,6 +14,9 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenAccessor;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Cubic;
+
+import com.rojel.fractals.render.Plotter;
+import com.rojel.fractals.render.PlottingListener;
 
 public class PlottingDisplay extends JComponent implements MouseListener, ComponentListener, PlottingListener, TweenAccessor<PlottingDisplay> {
 	private static final long serialVersionUID = -8158869774426846742L;
@@ -37,7 +40,6 @@ public class PlottingDisplay extends JComponent implements MouseListener, Compon
 		this.addComponentListener(this);
 
 		Tween.setCombinedAttributesLimit(4);
-		Tween.registerAccessor(Plotter.class, new PlotterAccessor());
 		Tween.registerAccessor(PlottingDisplay.class, this);
 		manager = new TweenManager();
 

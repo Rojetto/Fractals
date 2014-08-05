@@ -1,7 +1,9 @@
-package com.rojel.fractals;
+package com.rojel.fractals.render;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rojel.fractals.plottables.Plottable;
 
 public class Plotter {
 	private Plottable plottable;

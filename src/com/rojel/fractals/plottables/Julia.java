@@ -2,8 +2,6 @@ package com.rojel.fractals.plottables;
 
 import org.apache.commons.math3.complex.Complex;
 
-import com.rojel.fractals.Plottable;
-
 public class Julia implements Plottable {
 	private Complex c;
 	

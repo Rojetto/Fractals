@@ -1,50 +1,33 @@
-package com.rojel.fractals;
+package com.rojel.fractals.ui;
 
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import com.rojel.fractals.plottables.Mandelbrot;
+import com.rojel.fractals.render.Plotter;
+import com.rojel.fractals.render.PlottingListener;
 
 public class PlottingFrame extends JFrame implements PlottingListener {
 	private static final long serialVersionUID = -7367816153167274339L;
 
-	private JLabel label;
 	private PlottingDisplay display;
 	private JProgressBar progress;
 
 	public PlottingFrame() {
 		super("Plotter");
-		
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-//		double real = (Math.random() - 0.5) * 1.5;
-//		double imaginary = (Math.random() - 0.5) * 1.5;
-//		
-//		label = new JLabel(real + " + " + imaginary + "i");
-//		this.add(label, BorderLayout.NORTH);
-		
+
 		display = new PlottingDisplay(new Plotter(new Mandelbrot()));
 		this.add(display, BorderLayout.CENTER);
 

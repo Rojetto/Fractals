@@ -2,6 +2,8 @@ package com.rojel.fractals.plottables;
 
 import org.apache.commons.math3.complex.Complex;
 
+import com.rojel.fractals.render.ColorScheme;
+
 public class Julia implements Plottable {
 	private Complex c;
 	
@@ -10,7 +12,7 @@ public class Julia implements Plottable {
 	}
 	
 	@Override
-	public int getPixel(double x, double y, double xRes, double yRes) {
+	public int getPixel(double x, double y, double xRes, double yRes, ColorScheme scheme) {
 		int maxIterations = 200;
 		double bailout = 2;
 

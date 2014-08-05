@@ -8,7 +8,7 @@ import com.rojel.fractals.render.ColorScheme;
 
 public class Mandelbrot implements Plottable {
 	@Override
-	public int getPixel(double x, double y, double xRes, double yRes) {
+	public int getPixel(double x, double y, double xRes, double yRes, ColorScheme scheme) {
 		int maxIterations = (int) (100 + 0.006d / xRes);
 		double bailout = 50;
 		Complex c = new Complex(x, y);
@@ -23,10 +23,6 @@ public class Mandelbrot implements Plottable {
 		}
 
 		int color = Color.BLACK.getRGB();
-		
-		ColorScheme scheme = new ColorScheme();
-		scheme.putColor(0.0, new Color(100, 0, 0));
-		scheme.putColor(0.3, Color.RED);
 		
 		if (i < maxIterations - 1)
 			color = scheme.getRGB((double) i / (double) maxIterations);

@@ -7,6 +7,7 @@ import com.rojel.fractals.plottables.Plottable;
 
 public class Plotter {
 	private Plottable plottable;
+	private ColorScheme scheme;
 	private List<PlottingListener> listeners;
 	private PlottingThread plottingThread;
 	private double minX;
@@ -16,8 +17,9 @@ public class Plotter {
 	private int width;
 	private int height;
 
-	public Plotter(Plottable plottable) {
+	public Plotter(Plottable plottable, ColorScheme scheme) {
 		this.plottable = plottable;
+		this.scheme = scheme;
 		this.listeners = new ArrayList<PlottingListener>();
 
 		this.minX = -1;
@@ -132,6 +134,10 @@ public class Plotter {
 
 	public Plottable getPlottable() {
 		return plottable;
+	}
+
+	public ColorScheme getScheme() {
+		return scheme;
 	}
 
 	public List<PlottingListener> getListeners() {

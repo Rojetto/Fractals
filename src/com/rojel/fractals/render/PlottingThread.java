@@ -24,7 +24,7 @@ public class PlottingThread extends Thread {
 				if (cancelled)
 					return;
 				
-				int rgb = plotter.getPlottable().getPixel(plotter.screenToPlotX(x), plotter.screenToPlotY(y), xRes, yRes);
+				int rgb = plotter.getPlottable().getPixel(plotter.screenToPlotX(x), plotter.screenToPlotY(y), xRes, yRes, plotter.getScheme());
 				try {
 					image.setRGB(x, y, rgb);
 				} catch (Exception e) {

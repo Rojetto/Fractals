@@ -3,6 +3,7 @@ package com.rojel.fractals.render;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ColorScheme {
 	private Map<Double, Integer> colorMap;
@@ -42,6 +43,14 @@ public class ColorScheme {
 								, (int) (colorBefore.getBlue() + (colorAfter.getBlue() - colorBefore.getBlue()) * positionBetween));
 		
 		return color.getRGB();
+	}
+	
+	public Set<Double> getColorPositions() {
+		return colorMap.keySet();
+	}
+	
+	public void removeColor(double position) {
+		colorMap.remove(position);
 	}
 	
 	private double getPositionBefore(double position) {

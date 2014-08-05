@@ -28,12 +28,12 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		for (int x = 0; x < getWidth(); x++) {
-			g.setColor(new Color(scheme.getRGB((double) x / (double) getWidth())));
+			g.setColor(scheme.getColor((double) x / (double) getWidth()));
 			g.drawLine(x, 0, x, getHeight());
 		}
 		
 		for (double position : scheme.getColorPositions()) {
-			Color color = new Color(scheme.getRGB(position));
+			Color color = scheme.getColor(position);
 			Color marker = new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
 			g.setColor(marker);
 			
@@ -50,7 +50,8 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 		double mousePos = (double) e.getX() / (double) getWidth();
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
-			Color newColor = JColorChooser.showDialog(this, "Color for " + Math.round(mousePos * 100) / 100d, Color.WHITE);
+			Color defaultColor = scheme.getColor(mousePos);
+			Color newColor = JColorChooser.showDialog(this, "Color for " + Math.round(mousePos * 100) / 100d, defaultColor);
 			if (newColor != null)
 				scheme.putColor(mousePos, newColor);
 		}

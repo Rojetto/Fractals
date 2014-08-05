@@ -45,6 +45,10 @@ public class ColorScheme {
 		return color.getRGB();
 	}
 	
+	public Color getColor(double position) {
+		return new Color(getRGB(position));
+	}
+	
 	public Set<Double> getColorPositions() {
 		return colorMap.keySet();
 	}

@@ -1,5 +1,6 @@
 package com.rojel.fractals.ui;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,11 +28,11 @@ public class ColorSchemeManager {
 	}
 
 	public void putScheme(String name, ColorScheme scheme) {
-		schemes.put(name, scheme);
+		schemes.put(name, new ColorScheme(scheme));
 	}
 
 	public ColorScheme getScheme(String name) {
-		return schemes.get(name);
+		return new ColorScheme(schemes.get(name));
 	}
 
 	public Set<String> getSchemeNames() {
@@ -48,8 +49,7 @@ public class ColorSchemeManager {
 			while (!(line = br.readLine()).equals(";")) {
 				String[] split = line.split(" ");
 				double pos = Double.parseDouble(split[0]);
-				int rgb = Integer.parseInt(split[1]);
-				scheme.putColor(pos, rgb);
+				scheme.putColor(pos, new Color(Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3])));
 			}
 			schemes.put(name, scheme);
 		}
@@ -64,8 +64,11 @@ public class ColorSchemeManager {
 		for (String name : schemes.keySet()) {
 			bw.write(name + "\n");
 			ColorScheme scheme = schemes.get(name);
-			for (double pos : scheme.getColorPositions())
-				bw.write(pos + " " + scheme.getRGB(pos) + "\n");
+			for (double pos : scheme.getColorPositions()) {
+				Color color = scheme.getColor(pos);
+				System.out.println(pos + " " + color);
+				bw.write(pos + " " + color.getRed() + " " + color.getGreen() + " " + color.getBlue() + "\n");
+			}
 			bw.write(";\n");
 		}
 

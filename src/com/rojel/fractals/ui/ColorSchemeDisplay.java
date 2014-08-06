@@ -63,10 +63,11 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		double mousePos = (double) e.getX() / (double) getWidth();
+		mousePos = Math.round(mousePos * 20) / 20.0;
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			Color defaultColor = scheme.getColor(mousePos);
-			Color newColor = JColorChooser.showDialog(this, "Color for " + Math.round(mousePos * 100) / 100d, defaultColor);
+			Color newColor = JColorChooser.showDialog(this, "Color for " + mousePos, defaultColor);
 			if (newColor != null)
 				scheme.putColor(mousePos, newColor);
 		}

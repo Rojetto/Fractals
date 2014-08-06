@@ -14,12 +14,19 @@ public class ColorScheme {
 		colorMap.put(1.0, Color.WHITE.getRGB());
 	}
 	
+	public ColorScheme(ColorScheme colorScheme) {
+		this();
+		for (double pos : colorScheme.getColorPositions())
+			colorMap.put(pos, colorScheme.getRGB(pos));
+	}
+	
 	public void putColor(double position, int rgb) {
 		if (position < 0.0 || position > 1.0) {
 			System.out.println("Color position " + position + " out of range.");
 			return;
 		}
 		colorMap.put(position, rgb);
+		System.out.println(position + " " + new Color(rgb));
 	}
 	
 	public void putColor(double position, Color color) {
@@ -41,6 +48,9 @@ public class ColorScheme {
 		Color color = new Color((int) (colorBefore.getRed() + (colorAfter.getRed() - colorBefore.getRed()) * positionBetween)
 								, (int) (colorBefore.getGreen() + (colorAfter.getGreen() - colorBefore.getGreen()) * positionBetween)
 								, (int) (colorBefore.getBlue() + (colorAfter.getBlue() - colorBefore.getBlue()) * positionBetween));
+		
+		if (position == 1.0)
+			color = new Color(colorMap.get(1.0));
 		
 		return color.getRGB();
 	}

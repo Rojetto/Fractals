@@ -66,7 +66,6 @@ public class ColorSchemeManager {
 			ColorScheme scheme = schemes.get(name);
 			for (double pos : scheme.getColorPositions()) {
 				Color color = scheme.getColor(pos);
-				System.out.println(pos + " " + color);
 				bw.write(pos + " " + color.getRed() + " " + color.getGreen() + " " + color.getBlue() + "\n");
 			}
 			bw.write(";\n");

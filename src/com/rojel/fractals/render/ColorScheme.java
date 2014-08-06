@@ -10,7 +10,7 @@ public class ColorScheme {
 	
 	public ColorScheme() {
 		this.colorMap = new HashMap<Double, Integer>();
-		colorMap.put(0.0, Color.BLACK.getRGB());
+		colorMap.put(0.0, Color.WHITE.getRGB());
 		colorMap.put(1.0, Color.WHITE.getRGB());
 	}
 	
@@ -26,7 +26,6 @@ public class ColorScheme {
 			return;
 		}
 		colorMap.put(position, rgb);
-		System.out.println(position + " " + new Color(rgb));
 	}
 	
 	public void putColor(double position, Color color) {

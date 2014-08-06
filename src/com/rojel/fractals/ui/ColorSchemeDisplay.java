@@ -81,7 +81,7 @@ public class ColorSchemeDisplay extends JComponent implements MouseListener {
 			for (double marker : markersInRange) {
 				scheme.removeColor(marker);
 				if (marker == 0.0)
-					scheme.putColor(0.0, Color.BLACK);
+					scheme.putColor(0.0, Color.WHITE);
 				if (marker == 1.0)
 					scheme.putColor(1.0, Color.WHITE);
 			}
